@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANA戦略的PPプランニングツール | AMC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ana-primary: #00234B;
+            --ana-secondary: #005BAC;
+            --ana-light-blue: #E6F2FF;
+            --ana-red: #E60012;
+            --ana-green: #00A651;
+            --ana-orange: #FF6B00;
+            --ana-gray: #666666;
+            --ana-light-gray: #F5F5F5;
+            --ana-border: #DDDDDD;
+            --ana-text: #333333;
+        }
+
+        body {
+            font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "メイリオ", Meiryo, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--ana-text);
+            background: #FFFFFF;
+        }
+
+        /* Header */
+        .header {
+            background: var(--ana-primary);
+            height: 80px;
+            position: relative;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Navigation */
+        .navigation {
+            background: var(--ana-secondary);
+            height: 48px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-item {
+            padding: 0 20px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-item.active {
+            border-bottom-color: white;
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: calc(100vh - 200px);
+        }
+
+        .page-title {
+            font-size: 24px;
+            color: var(--ana-primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--ana-secondary);
+        }
+
+        /* Sections */
+        .section {
+            background: white;
+            border: 1px solid var(--ana-border);
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-radius: 8px;
+        }
+
+        .section-header {
+            background: var(--ana-light-gray);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--ana-border);
+            font-weight: bold;
+            color: var(--ana-primary);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .section-content {
+            padding: 20px;
+        }
+
+        /* Forms */
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-group.small {
+            flex: 0.5;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--ana-text);
+            font-size: 13px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--ana-border);
+            background: white;
+            font-size: 14px;
+            color: var(--ana-text);
+            border-radius: 4px;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--ana-secondary);
+            box-shadow: 0 0 0 2px rgba(0, 91, 172, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .btn-primary {
+            background: var(--ana-secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--ana-primary);
+        }
+
+        .btn-add {
+            background: var(--ana-light-blue);
+            color: var(--ana-secondary);
+            padding: 6px 16px;
+            font-size: 13px;
+        }
+
+        .btn-add:hover {
+            background: #CCE5FF;
+        }
+
+        .btn-remove {
+            background: #fff5f5;
+            color: var(--ana-red);
+            padding: 6px 12px;
+            font-size: 12px;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-remove:hover {
+            background: #fef2f2;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Trip Calculator Enhancements */
+        .flight-entry {
+            border: 1px solid var(--ana-border);
+            padding: 20px;
+            margin-bottom: 15px;
+            background: var(--ana-light-gray);
+            border-radius: 8px;
+        }
+
+        .flight-entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .flight-number {
+            font-weight: bold;
+            color: var(--ana-primary);
+            font-size: 16px;
+        }
+
+        .distance-display {
+            font-size: 12px;
+            color: var(--ana-gray);
+            margin-top: 5px;
+            padding: 5px 10px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid var(--ana-border);
+        }
+
+        .route-type-indicator {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .route-domestic {
+            background: var(--ana-green);
+            color: white;
+        }
+
+        .route-international {
+            background: var(--ana-orange);
+            color: white;
+        }
+
+        /* Enhanced Results */
+        .results-dashboard {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .results-main {
+            background: var(--ana-light-blue);
+            border: 2px solid var(--ana-secondary);
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .results-summary {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--ana-border);
+        }
+
+        .results-title {
+            font-size: 18px;
+            color: var(--ana-primary);
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border: 1px solid var(--ana-border);
+            border-radius: 6px;
+        }
+
+        .result-label {
+            color: var(--ana-gray);
+            font-size: 13px;
+        }
+
+        .result-value {
+            font-weight: bold;
+            color: var(--ana-primary);
+            font-size: 16px;
+        }
+
+        .result-highlight {
+            grid-column: 1 / -1;
+            background: var(--ana-primary);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 6px;
+        }
+
+        .result-highlight .result-value {
+            color: white;
+            font-size: 20px;
+        }
+
+        /* Efficiency Indicators */
+        .efficiency-meter {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .efficiency-bar {
+            flex: 1;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            margin: 0 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .efficiency-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        .efficiency-excellent { background: var(--ana-green); }
+        .efficiency-good { background: var(--ana-secondary); }
+        .efficiency-average { background: var(--ana-orange); }
+        .efficiency-poor { background: var(--ana-red); }
+
+        /* Status Progress Ring */
+        .status-progress {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-ring {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 10px;
+        }
+
+        /* Route Efficiency Table */
+        .efficiency-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .efficiency-table th {
+            background: var(--ana-primary);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .efficiency-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--ana-border);
+            font-size: 13px;
+        }
+
+        .efficiency-table tr:nth-child(even) {
+            background: var(--ana-light-gray);
+        }
+
+        .efficiency-table tr:hover {
+            background: var(--ana-light-blue);
+        }
+
+        .efficiency-score {
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: white;
+            font-size: 11px;
+        }
+
+        /* Planning Tools */
+        .planning-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .goal-setting {
+            background: white;
+            padding: 20px;
+            border: 1px solid var(--ana-border);
+            border-radius: 8px;
+        }
+
+        .recommendations {
+            background: var(--ana-light-blue);
+            padding: 20px;
+            border: 1px solid var(--ana-secondary);
+            border-radius: 8px;
+        }
+
+        .timeline-visual {
+            background: white;
+            padding: 20px;
+            border: 1px solid var(--ana-border);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .timeline-bar {
+            height: 20px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            position: relative;
+            margin: 10px 0;
+        }
+
+        .timeline-progress {
+            height: 100%;
+            background: var(--ana-secondary);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .suggestion-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid var(--ana-secondary);
+            border-radius: 4px;
+        }
+
+        /* Quick Templates */
+        .template-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .template-btn {
+            padding: 8px 16px;
+            background: var(--ana-light-gray);
+            color: var(--ana-text);
+            border: 1px solid var(--ana-border);
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .template-btn:hover {
+            background: var(--ana-light-blue);
+            border-color: var(--ana-secondary);
+        }
+
+        /* Notice Box */
+        .notice {
+            background: #FFF9E6;
+            border: 1px solid #FFD700;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--ana-text);
+            border-radius: 6px;
+        }
+
+        .notice-icon {
+            color: #FF9900;
+            margin-right: 5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .results-dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .planning-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-item {
+                padding: 0 10px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="#" class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="white">
+                    <circle cx="20" cy="20" r="18" stroke="white" stroke-width="2" fill="none"/>
+                    <text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="white" font-size="14" font-weight="bold">ANA</text>
+                </svg>
+                <span>戦略的PPプランニングツール</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="navigation">
+        <div class="nav-content">
+            <button class="nav-item active" onclick="switchTab('trip-calculator')">旅行計算機</button>
+            <button class="nav-item" onclick="switchTab('efficiency-analyzer')">効率分析</button>
+            <button class="nav-item" onclick="switchTab('status-planner')">ステータス戦略</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Trip Calculator Tab -->
+        <div id="trip-calculator" class="tab-content active">
+            <h1 class="page-title">旅行計算機 - PP・マイル・効率を同時分析</h1>
+            
+            <div class="notice">
+                <span class="notice-icon">💡</span>
+                チケット価格を入力してPP効率を計算。最適な予約クラスとルートを見つけましょう。
+            </div>
+
+            <!-- Quick Templates -->
+            <div class="template-buttons">
+                <button class="template-btn" onclick="loadTemplate('business')">📊 出張パターン</button>
+                <button class="template-btn" onclick="loadTemplate('leisure')">🏖️ 休暇旅行</button>
+                <button class="template-btn" onclick="loadTemplate('pp-run')">🏃 PP修行</button>
+                <button class="template-btn" onclick="loadTemplate('international')">✈️ 国際線</button>
+            </div>
+
+            <div class="section">
+                <div class="section-header">フライト詳細入力</div>
+                <div class="section-content">
+                    <div id="flights-container">
+                        <!-- First Flight Entry -->
+                        <div class="flight-entry">
+                            <div class="flight-entry-header">
+                                <span class="flight-number">フライト 1</span>
+                                <button class="btn btn-remove" onclick="removeFlight(this)">削除</button>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">出発空港</label>
+                                    <select class="form-select from-airport" onchange="updateRouteInfo(this)">
+                                        <option value="">出発空港を選択...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">到着空港</label>
+                                    <select class="form-select to-airport" onchange="updateRouteInfo(this)">
+                                        <option value="">到着空港を選択...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">予約クラス</label>
+                                    <select class="form-select booking-class">
+                                        <option value="Y">エコノミー (Y) - 100%</option>
+                                        <option value="B">エコノミー (B) - 70%</option>
+                                        <option value="M">エコノミー (M) - 50%</option>
+                                        <option value="W">プレミアムエコノミー (W) - 130%</option>
+                                        <option value="J">ビジネス (J) - 150%</option>
+                                        <option value="F">ファースト (F) - 200%</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">チケット価格 (税込)</label>
+                                    <input type="number" class="form-input ticket-price" placeholder="例: 85000" min="0">
+                                    <small style="color: var(--ana-gray);">円</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">運航会社</label>
+                                    <select class="form-select airline">
+                                        <option value="ana">ANA</option>
+                                        <option value="star-alliance">スターアライアンス</option>
+                                        <option value="partner">提携航空会社</option>
+                                    </select>
+                                </div>
+                                <div class="form-group small">
+                                    <label class="form-label">区間数</label>
+                                    <input type="number" class="form-input segments" value="1" min="1">
+                                </div>
+                            </div>
+                            <div class="distance-display"></div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-add" onclick="addFlight()">+ フライトを追加</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">ステータス・設定</div>
+                <div class="section-content">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">現在のAMCステータス</label>
+                            <select class="form-select" id="current-status">
+                                <option value="none">AMCメンバー</option>
+                                <option value="bronze">ブロンズサービス (+30%)</option>
+                                <option value="platinum">プラチナサービス (+50%)</option>
+                                <option value="diamond">ダイヤモンドサービス (+100%)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">現在のPP残高</label>
+                            <input type="number" class="form-input" id="current-pp" placeholder="0" value="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <button class="btn btn-primary" onclick="calculateTrip()">
+                    📊 詳細分析を実行
+                </button>
+            </div>
+
+            <div id="trip-results" style="display: none;">
+                <div class="results-dashboard">
+                    <div class="results-main">
+                        <h2 class="results-title">📈 トリップ分析結果</h2>
+                        <div class="results-grid">
+                            <div class="result-item">
+                                <span class="result-label">獲得PP</span>
+                                <span class="result-value" id="total-pp">0</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">獲得マイル</span>
+                                <span class="result-value" id="total-miles">0</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">総費用</span>
+                                <span class="result-value" id="total-cost">¥0</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">PP効率</span>
+                                <span class="result-value" id="pp-efficiency">0 PP/¥1000</span>
+                            </div>
+                            <div class="result-highlight">
+                                <span class="result-label">コストパフォーマンス評価</span>
+                                <div class="efficiency-meter">
+                                    <span style="font-size: 12px;">低効率</span>
+                                    <div class="efficiency-bar">
+                                        <div class="efficiency-fill" id="efficiency-bar"></div>
+                                    </div>
+                                    <span style="font-size: 12px;">高効率</span>
+                                </div>
+                                <div id="efficiency-rating" style="margin-top: 10px; font-weight: bold;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="results-summary">
+                        <h3 class="results-title">🎯 ステータス進捗</h3>
+                        <div class="status-progress">
+                            <div class="progress-ring">
+                                <svg width="100" height="100" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="40" stroke="#e5e7eb" stroke-width="8" fill="transparent"/>
+                                    <circle cx="50" cy="50" r="40" stroke="var(--ana-secondary)" stroke-width="8" fill="transparent"
+                                            stroke-dasharray="251.2" stroke-dashoffset="251.2" id="progress-circle"
+                                            style="transition: stroke-dashoffset 0.5s ease;"/>
+                                    <text x="50" y="50" text-anchor="middle" dy="0.3em" font-size="14" font-weight="bold" fill="var(--ana-primary)" id="progress-percent">0%</text>
+                                </svg>
+                            </div>
+                            <div id="status-text">次のステータスまで</div>
+                        </div>
+                        <div id="status-recommendations">
+                            <!-- Dynamic recommendations will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Efficiency Analyzer Tab -->
+        <div id="efficiency-analyzer" class="tab-content">
+            <h1 class="page-title">ルート効率分析 - 最適なPP獲得戦略</h1>
+            
+            <div class="notice">
+                <span class="notice-icon">🔍</span>
+                利用可能なルートをPP効率でランキング表示。予算とニーズに最適なルートを発見できます。
+            </div>
+
+            <div class="section">
+                <div class="section-header">分析条件設定</div>
+                <div class="section-content">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">出発地域</label>
+                            <select class="form-select" id="analysis-region">
+                                <option value="all">すべての地域</option>
+                                <option value="domestic">国内線のみ</option>
+                                <option value="asia">アジア路線</option>
+                                <option value="americas">アメリカ路線</option>
+                                <option value="europe">ヨーロッパ路線</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">予算上限</label>
+                            <input type="number" class="form-input" id="budget-limit" placeholder="例: 200000" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">最低PP要件</label>
+                            <input type="number" class="form-input" id="min-pp" placeholder="例: 2000" min="0">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="analyzeEfficiency()">効率分析を実行</button>
+                </div>
+            </div>
+
+            <div id="efficiency-results" style="display: none;">
+                <div class="section">
+                    <div class="section-header">🏆 ルート効率ランキング</div>
+                    <div class="section-content">
+                        <table class="efficiency-table">
+                            <thead>
+                                <tr>
+                                    <th>順位</th>
+                                    <th>ルート</th>
+                                    <th>推奨クラス</th>
+                                    <th>PP獲得</th>
+                                    <th>概算価格</th>
+                                    <th>PP効率</th>
+                                    <th>評価</th>
+                                    <th>タイプ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="efficiency-table-body">
+                                <!-- Dynamic content will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Planner Tab -->
+        <div id="status-planner" class="tab-content">
+            <h1 class="page-title">ステータス戦略プランナー - 目標達成への最短ルート</h1>
+            
+            <div class="notice">
+                <span class="notice-icon">🎯</span>
+                目標ステータス達成に必要なフライト数、費用、期間を計算。最効率な戦略を提案します。
+            </div>
+
+            <div class="planning-grid">
+                <div class="goal-setting">
+                    <h3 style="color: var(--ana-primary); margin-bottom: 15px;">🎯 目標設定</h3>
+                    <div class="form-group">
+                        <label class="form-label">目標ステータス</label>
+                        <select class="form-select" id="target-status">
+                            <option value="bronze">ブロンズサービス (30,000 PP)</option>
+                            <option value="platinum">プラチナサービス (50,000 PP)</option>
+                            <option value="diamond">ダイヤモンドサービス (100,000 PP)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">現在のPP</label>
+                        <input type="number" class="form-input" id="planning-current-pp" value="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">達成期限</label>
+                        <input type="date" class="form-input" id="target-date">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">月間予算上限</label>
+                        <input type="number" class="form-input" id="monthly-budget" placeholder="例: 300000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">優先出発空港</label>
+                        <select class="form-select" id="preferred-airport">
+                            <option value="NRT">東京成田 (NRT)</option>
+                            <option value="HND">東京羽田 (HND)</option>
+                            <option value="KIX">大阪関西 (KIX)</option>
+                            <option value="NGO">名古屋中部 (NGO)</option>
+                            <option value="CTS">札幌新千歳 (CTS)</option>
+                            <option value="FUK">福岡 (FUK)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="generatePlan()">最適プランを生成</button>
+                </div>
+
+                <div class="recommendations">
+                    <h3 style="color: var(--ana-primary); margin-bottom: 15px;">💡 戦略提案</h3>
+                    <div id="strategy-recommendations">
+                        <div style="text-align: center; color: var(--ana-gray); padding: 40px;">
+                            左側で目標を設定して<br>「最適プランを生成」をクリック
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="planning-results" class="timeline-visual" style="display: none;">
+                <h3 style="color: var(--ana-primary); margin-bottom: 15px;">📅 達成タイムライン</h3>
+                <div id="timeline-content">
+                    <!-- Timeline will be generated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced route distances and PP rates
+        const routeDistances = {
+            'NRT-LAX': 5451, 'NRT-JFK': 6737, 'NRT-LHR': 5956, 'NRT-SIN': 3312, 'NRT-SYD': 4863, 'NRT-FRA': 5928,
+            'NRT-CDG': 6012, 'NRT-AMS': 5863, 'NRT-MAD': 6734, 'NRT-FCO': 6125, 'NRT-ZUR': 5890, 'NRT-VIE': 5623,
+            'HND-ORD': 6262, 'HND-LAX': 5440, 'HND-SFO': 5130, 'HND-SEA': 4782, 'HND-DFW': 6456, 'HND-IAH': 6804,
+            'KIX-SFO': 5358, 'KIX-LAX': 5481, 'KIX-HNL': 3856, 'KIX-SIN': 3243, 'KIX-BKK': 2869, 'KIX-ICN': 540,
+            'NGO-SEA': 4782, 'NGO-SFO': 5116, 'NGO-HNL': 3853, 'FUK-HNL': 3853, 'FUK-ICN': 541, 'FUK-SIN': 3312,
+            'NRT-BKK': 2869, 'NRT-SFO': 5130, 'NRT-SEA': 4782, 'NRT-HKG': 1807, 'NRT-ICN': 758, 'NRT-PEK': 1313,
+            'NRT-PVG': 1094, 'NRT-TPE': 1313, 'NRT-MNL': 1864, 'NRT-KUL': 3312, 'NRT-CGK': 3632, 'NRT-BOM': 4163,
+            'NRT-DEL': 3665, 'NRT-DXB': 5063, 'NRT-DOH': 4953, 'NRT-IST': 5623, 'NRT-CAI': 5890, 'NRT-JNB': 8912,
+            'HND-ICN': 720, 'HND-PVG': 1090, 'HND-TPE': 1310, 'HND-HKG': 1800, 'HND-SIN': 3308, 'HND-BKK': 2865,
+            'KIX-HKG': 1463, 'KIX-TPE': 976, 'KIX-PVG': 754, 'KIX-PEK': 983, 'KIX-MNL': 1520, 'KIX-GUM': 1225,
+            'NGO-ICN': 598, 'NGO-TPE': 1153, 'NGO-PVG': 934, 'NGO-HKG': 1647, 'NGO-GUM': 1405, 'NGO-SIN': 3152,
+            'CTS-ICN': 600, 'CTS-TPE': 1353, 'CTS-HKG': 1847, 'CTS-SIN': 3352, 'CTS-BKK': 3069, 'CTS-GUM': 1605,
+            'OKA-ICN': 618, 'OKA-TPE': 613, 'OKA-HKG': 881, 'OKA-SIN': 2450, 'OKA-BKK': 2167, 'OKA-MNL': 758,
+            // Domestic routes
+            'NRT-HND': 20, 'NRT-KIX': 280, 'NRT-NGO': 180, 'NRT-CTS': 510, 'NRT-FUK': 565, 'NRT-OKA': 984,
+            'HND-KIX': 280, 'HND-NGO': 180, 'HND-CTS': 510, 'HND-FUK': 565, 'HND-OKA': 984,
+            'KIX-NGO': 120, 'KIX-CTS': 730, 'KIX-FUK': 285, 'KIX-OKA': 704
+        };
+
+        // Airport names in Japanese
+        const airportNames = {
+            'NRT': '東京成田 (NRT)', 'HND': '東京羽田 (HND)', 'KIX': '大阪関西 (KIX)', 'ITM': '大阪伊丹 (ITM)',
+            'NGO': '名古屋中部 (NGO)', 'CTS': '札幌新千歳 (CTS)', 'FUK': '福岡 (FUK)', 'OKA': '沖縄那覇 (OKA)',
+            'LAX': 'ロサンゼルス (LAX)', 'SFO': 'サンフランシスコ (SFO)', 'SEA': 'シアトル (SEA)', 
+            'JFK': 'ニューヨーク JFK (JFK)', 'ORD': 'シカゴ オヘア (ORD)', 'DFW': 'ダラス (DFW)', 'IAH': 'ヒューストン (IAH)',
+            'LHR': 'ロンドン ヒースロー (LHR)', 'CDG': 'パリ CDG (CDG)', 'FRA': 'フランクフルト (FRA)', 
+            'AMS': 'アムステルダム (AMS)', 'MAD': 'マドリード (MAD)', 'FCO': 'ローマ (FCO)', 'ZUR': 'チューリッヒ (ZUR)',
+            'SIN': 'シンガポール (SIN)', 'BKK': 'バンコク (BKK)', 'HKG': '香港 (HKG)', 'ICN': 'ソウル仁川 (ICN)',
+            'PEK': '北京首都 (PEK)', 'PVG': '上海浦東 (PVG)', 'TPE': '台北桃園 (TPE)', 'MNL': 'マニラ (MNL)',
+            'GUM': 'グアム (GUM)', 'HNL': 'ホノルル (HNL)'
+        };
+
+        // Class earning rates and typical prices
+        const classData = {
+            'Y': { rate: 1.0, name: 'エコノミー (Y)', priceMultiplier: 1.0 },
+            'B': { rate: 0.7, name: 'エコノミー (B)', priceMultiplier: 0.85 },
+            'M': { rate: 0.5, name: 'エコノミー (M)', priceMultiplier: 0.7 },
+            'W': { rate: 1.3, name: 'プレミアムエコノミー (W)', priceMultiplier: 1.8 },
+            'J': { rate: 1.5, name: 'ビジネス (J)', priceMultiplier: 4.0 },
+            'F': { rate: 2.0, name: 'ファースト (F)', priceMultiplier: 8.0 }
+        };
+
+        // Status bonus rates
+        const statusBonus = {
+            'none': 0, 'bronze': 0.3, 'platinum': 0.5, 'diamond': 1.0
+        };
+
+        // PP rates by route type
+        const ppRates = {
+            domestic: { base: 2, max: 8 },
+            international: { base: 5, max: 12 }
+        };
+
+        let flightCounter = 1;
+
+        // Initialize airports
+        function initializeAirports() {
+            const airports = Object.keys(airportNames).sort();
+            const selects = document.querySelectorAll('.from-airport, .to-airport');
+            
+            selects.forEach(select => {
+                const isFrom = select.classList.contains('from-airport');
+                select.innerHTML = isFrom ? '<option value="">出発空港を選択...</option>' : '<option value="">到着空港を選択...</option>';
+                airports.forEach(code => {
+                    const option = document.createElement('option');
+                    option.value = code;
+                    option.textContent = airportNames[code];
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        // Template loading
+        function loadTemplate(type) {
+            const container = document.getElementById('flights-container');
+            container.innerHTML = '';
+            flightCounter = 0;
+
+            const templates = {
+                business: [
+                    { from: 'HND', to: 'ICN', class: 'J', price: 180000 },
+                    { from: 'ICN', to: 'HND', class: 'J', price: 180000 }
+                ],
+                leisure: [
+                    { from: 'NRT', to: 'HNL', class: 'Y', price: 85000 }
+                ],
+                'pp-run': [
+                    { from: 'HND', to: 'ICN', class: 'Y', price: 35000 },
+                    { from: 'ICN', to: 'HND', class: 'Y', price: 35000 },
+                    { from: 'NRT', to: 'SIN', class: 'Y', price: 75000 }
+                ],
+                international: [
+                    { from: 'NRT', to: 'LAX', class: 'W', price: 280000 }
+                ]
+            };
+
+            templates[type].forEach(flight => {
+                addFlight();
+                const lastFlight = container.lastElementChild;
+                lastFlight.querySelector('.from-airport').value = flight.from;
+                lastFlight.querySelector('.to-airport').value = flight.to;
+                lastFlight.querySelector('.booking-class').value = flight.class;
+                lastFlight.querySelector('.ticket-price').value = flight.price;
+                updateRouteInfo(lastFlight.querySelector('.from-airport'));
+            });
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Flight management
+        function addFlight() {
+            flightCounter++;
+            const container = document.getElementById('flights-container');
+            const newFlight = document.createElement('div');
+            newFlight.className = 'flight-entry';
+            newFlight.innerHTML = `
+                <div class="flight-entry-header">
+                    <span class="flight-number">フライト ${flightCounter}</span>
+                    <button class="btn btn-remove" onclick="removeFlight(this)">削除</button>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">出発空港</label>
+                        <select class="form-select from-airport" onchange="updateRouteInfo(this)">
+                            <option value="">出発空港を選択...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">到着空港</label>
+                        <select class="form-select to-airport" onchange="updateRouteInfo(this)">
+                            <option value="">到着空港を選択...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">予約クラス</label>
+                        <select class="form-select booking-class">
+                            <option value="Y">エコノミー (Y) - 100%</option>
+                            <option value="B">エコノミー (B) - 70%</option>
+                            <option value="M">エコノミー (M) - 50%</option>
+                            <option value="W">プレミアムエコノミー (W) - 130%</option>
+                            <option value="J">ビジネス (J) - 150%</option>
+                            <option value="F">ファースト (F) - 200%</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">チケット価格 (税込)</label>
+                        <input type="number" class="form-input ticket-price" placeholder="例: 85000" min="0">
+                        <small style="color: var(--ana-gray);">円</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">運航会社</label>
+                        <select class="form-select airline">
+                            <option value="ana">ANA</option>
+                            <option value="star-alliance">スターアライアンス</option>
+                            <option value="partner">提携航空会社</option>
+                        </select>
+                    </div>
+                    <div class="form-group small">
+                        <label class="form-label">区間数</label>
+                        <input type="number" class="form-input segments" value="1" min="1">
+                    </div>
+                </div>
+                <div class="distance-display"></div>
+            `;
+            container.appendChild(newFlight);
+            
+            // Initialize dropdowns
+            const airports = Object.keys(airportNames).sort();
+            const fromSelect = newFlight.querySelector('.from-airport');
+            const toSelect = newFlight.querySelector('.to-airport');
+            
+            [fromSelect, toSelect].forEach(select => {
+                airports.forEach(code => {
+                    const option = document.createElement('option');
+                    option.value = code;
+                    option.textContent = airportNames[code];
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        function removeFlight(button) {
+            button.closest('.flight-entry').remove();
+        }
+
+        // Route information update
+        function updateRouteInfo(select) {
+            const flight = select.closest('.flight-entry');
+            const from = flight.querySelector('.from-airport').value;
+            const to = flight.querySelector('.to-airport').value;
+            const display = flight.querySelector('.distance-display');
+            
+            if (from && to) {
+                const distance = getDistance(from, to);
+                const routeType = isInternational(from, to) ? 'international' : 'domestic';
+                const typeClass = routeType === 'domestic' ? 'route-domestic' : 'route-international';
+                const typeText = routeType === 'domestic' ? '国内線' : '国際線';
+                
+                if (distance > 0) {
+                    display.innerHTML = `
+                        距離: ${distance.toLocaleString()} マイル
+                        <span class="route-type-indicator ${typeClass}">${typeText}</span>
+                    `;
+                } else {
+                    display.innerHTML = '<span style="color: var(--ana-red);">このルートはデータベースにありません</span>';
+                }
+            } else {
+                display.innerHTML = '';
+            }
+        }
+
+        // Utility functions
+        function getDistance(from, to) {
+            const route = `${from}-${to}`;
+            const reverse = `${to}-${from}`;
+            return routeDistances[route] || routeDistances[reverse] || 0;
+        }
+
+        function isInternational(from, to) {
+            const domesticAirports = ['NRT', 'HND', 'KIX', 'ITM', 'NGO', 'CTS', 'FUK', 'OKA'];
+            return !(domesticAirports.includes(from) && domesticAirports.includes(to));
+        }
+
+        function calculatePP(distance, classCode, routeType, segments = 1) {
+            const baseRate = classData[classCode].rate;
+            const ppPerMile = routeType === 'domestic' ? 
+                Math.min(ppRates.domestic.base * baseRate, ppRates.domestic.max) :
+                Math.min(ppRates.international.base * baseRate, ppRates.international.max);
+            return Math.floor(distance * ppPerMile * segments);
+        }
+
+        function calculateMiles(distance, classCode, airline, segments = 1) {
+            const baseRate = classData[classCode].rate;
+            const airlineMultiplier = airline === 'ana' ? 1.0 : (airline === 'star-alliance' ? 0.8 : 0.6);
+            return Math.floor(distance * baseRate * airlineMultiplier * segments);
+        }
+
+        // Main calculation function
+        function calculateTrip() {
+            try {
+                const flights = document.querySelectorAll('.flight-entry');
+                const currentStatus = document.getElementById('current-status').value;
+                const currentPP = parseInt(document.getElementById('current-pp').value) || 0;
+                
+                let totalPP = 0;
+                let totalMiles = 0;
+                let totalCost = 0;
+                let validFlights = 0;
+
+                flights.forEach(flight => {
+                    const from = flight.querySelector('.from-airport').value;
+                    const to = flight.querySelector('.to-airport').value;
+                    const classCode = flight.querySelector('.booking-class').value;
+                    const price = parseInt(flight.querySelector('.ticket-price').value) || 0;
+                    const airline = flight.querySelector('.airline').value;
+                    const segments = parseInt(flight.querySelector('.segments').value) || 1;
+
+                    if (from && to && price > 0) {
+                        const distance = getDistance(from, to);
+                        if (distance > 0) {
+                            validFlights++;
+                            const routeType = isInternational(from, to) ? 'international' : 'domestic';
+                            
+                            // Calculate base PP and miles
+                            const basePP = calculatePP(distance, classCode, routeType, segments);
+                            const baseMiles = calculateMiles(distance, classCode, airline, segments);
+                            
+                            // Apply status bonus
+                            const statusMultiplier = 1 + statusBonus[currentStatus];
+                            const finalPP = Math.floor(basePP * statusMultiplier);
+                            const finalMiles = Math.floor(baseMiles * statusMultiplier);
+                            
+                            totalPP += finalPP;
+                            totalMiles += finalMiles;
+                            totalCost += price;
+                        }
+                    }
+                });
+
+                if (validFlights === 0) {
+                    alert('有効なフライトを入力してください（価格も含む）');
+                    return;
+                }
+
+                // Calculate efficiency
+                const ppEfficiency = totalCost > 0 ? (totalPP / totalCost * 1000) : 0;
+                
+                // Update display
+                document.getElementById('total-pp').textContent = totalPP.toLocaleString();
+                document.getElementById('total-miles').textContent = totalMiles.toLocaleString();
+                document.getElementById('total-cost').textContent = `¥${totalCost.toLocaleString()}`;
+                document.getElementById('pp-efficiency').textContent = `${ppEfficiency.toFixed(1)} PP/¥1000`;
+
+                // Efficiency rating
+                let efficiencyClass, efficiencyText, efficiencyPercent;
+                if (ppEfficiency >= 15) {
+                    efficiencyClass = 'efficiency-excellent';
+                    efficiencyText = '🏆 優秀な効率';
+                    efficiencyPercent = 90;
+                } else if (ppEfficiency >= 10) {
+                    efficiencyClass = 'efficiency-good';
+                    efficiencyText = '👍 良好な効率';
+                    efficiencyPercent = 70;
+                } else if (ppEfficiency >= 5) {
+                    efficiencyClass = 'efficiency-average';
+                    efficiencyText = '📊 平均的な効率';
+                    efficiencyPercent = 50;
+                } else {
+                    efficiencyClass = 'efficiency-poor';
+                    efficiencyText = '⚠️ 効率改善必要';
+                    efficiencyPercent = 25;
+                }
+
+                const efficiencyBar = document.getElementById('efficiency-bar');
+                const efficiencyRating = document.getElementById('efficiency-rating');
+                efficiencyBar.className = `efficiency-fill ${efficiencyClass}`;
+                efficiencyBar.style.width = `${efficiencyPercent}%`;
+                efficiencyRating.textContent = efficiencyText;
+
+                // Status progress
+                updateStatusProgress(currentPP + totalPP);
+
+                document.getElementById('trip-results').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Calculation error:', error);
+                alert('計算中にエラーが発生しました');
+            }
+        }
+
+        function updateStatusProgress(totalPP) {
+            const thresholds = { bronze: 30000, platinum: 50000, diamond: 100000 };
+            let targetStatus, targetPP, progress;
+
+            if (totalPP < thresholds.bronze) {
+                targetStatus = 'ブロンズサービス';
+                targetPP = thresholds.bronze;
+                progress = (totalPP / targetPP) * 100;
+            } else if (totalPP < thresholds.platinum) {
+                targetStatus = 'プラチナサービス';
+                targetPP = thresholds.platinum;
+                progress = (totalPP / targetPP) * 100;
+            } else if (totalPP < thresholds.diamond) {
+                targetStatus = 'ダイヤモンドサービス';
+                targetPP = thresholds.diamond;
+                progress = (totalPP / targetPP) * 100;
+            } else {
+                targetStatus = 'ダイヤモンド達成済み';
+                targetPP = thresholds.diamond;
+                progress = 100;
+            }
+
+            const circle = document.getElementById('progress-circle');
+            const text = document.getElementById('progress-percent');
+            const statusText = document.getElementById('status-text');
+            
+            const circumference = 251.2;
+            const offset = circumference - (progress / 100) * circumference;
+            
+            circle.style.strokeDashoffset = offset;
+            text.textContent = `${Math.round(progress)}%`;
+            statusText.textContent = `${targetStatus}まで ${(targetPP - totalPP).toLocaleString()} PP`;
+
+            // Recommendations
+            const recommendations = document.getElementById('status-recommendations');
+            const remaining = targetPP - totalPP;
+            
+            if (remaining > 0) {
+                recommendations.innerHTML = `
+                    <div class="suggestion-item">
+                        <strong>必要PP:</strong> ${remaining.toLocaleString()} PP<br>
+                        <strong>HND-ICN往復なら:</strong> 約${Math.ceil(remaining / 2500)}回<br>
+                        <strong>概算費用:</strong> ¥${(Math.ceil(remaining / 2500) * 70000).toLocaleString()}
+                    </div>
+                `;
+            } else {
+                recommendations.innerHTML = `
+                    <div class="suggestion-item" style="background: var(--ana-light-blue);">
+                        🎉 おめでとうございます！<br>
+                        ${targetStatus}の条件を満たしています
+                    </div>
+                `;
+            }
+        }
+
+        // Efficiency analyzer
+        function analyzeEfficiency() {
+            const routes = generateRouteAnalysis();
+            displayEfficiencyResults(routes);
+        }
+
+        function generateRouteAnalysis() {
+            const routes = [];
+            const airports = Object.keys(airportNames);
+            
+            // Generate sample efficient routes
+            const sampleRoutes = [
+                { from: 'HND', to: 'ICN', distance: 720, price: 35000, type: 'international' },
+                { from: 'KIX', to: 'ICN', distance: 540, price: 32000, type: 'international' },
+                { from: 'NRT', to: 'SIN', distance: 3312, price: 75000, type: 'international' },
+                { from: 'HND', to: 'TPE', distance: 1310, price: 55000, type: 'international' },
+                { from: 'NRT', to: 'HKG', distance: 1807, price: 65000, type: 'international' },
+                { from: 'KIX', to: 'BKK', distance: 2869, price: 70000, type: 'international' },
+                { from: 'NRT', to: 'LAX', distance: 5451, price: 120000, type: 'international' },
+                { from: 'HND', to: 'SFO', distance: 5130, price: 115000, type: 'international' }
+            ];
+
+            sampleRoutes.forEach((route, index) => {
+                ['Y', 'W', 'J'].forEach(classCode => {
+                    const price = Math.floor(route.price * classData[classCode].priceMultiplier);
+                    const pp = calculatePP(route.distance, classCode, route.type);
+                    const efficiency = (pp / price * 1000);
+                    
+                    routes.push({
+                        rank: 0,
+                        route: `${airportNames[route.from].split('(')[0].trim()} → ${airportNames[route.to].split('(')[0].trim()}`,
+                        class: classData[classCode].name,
+                        pp: pp,
+                        price: price,
+                        efficiency: efficiency,
+                        type: route.type === 'domestic' ? '国内線' : '国際線'
+                    });
+                });
+            });
+
+            // Sort by efficiency and assign ranks
+            routes.sort((a, b) => b.efficiency - a.efficiency);
+            routes.forEach((route, index) => {
+                route.rank = index + 1;
+            });
+
+            return routes.slice(0, 20); // Top 20
+        }
+
+        function displayEfficiencyResults(routes) {
+            const tbody = document.getElementById('efficiency-table-body');
+            tbody.innerHTML = '';
+
+            routes.forEach(route => {
+                let efficiencyClass, efficiencyText;
+                if (route.efficiency >= 15) {
+                    efficiencyClass = 'efficiency-excellent';
+                    efficiencyText = '優秀';
+                } else if (route.efficiency >= 10) {
+                    efficiencyClass = 'efficiency-good';
+                    efficiencyText = '良好';
+                } else if (route.efficiency >= 5) {
+                    efficiencyClass = 'efficiency-average';
+                    efficiencyText = '平均';
+                } else {
+                    efficiencyClass = 'efficiency-poor';
+                    efficiencyText = '低効率';
+                }
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${route.rank}</strong></td>
+                    <td>${route.route}</td>
+                    <td>${route.class}</td>
+                    <td>${route.pp.toLocaleString()} PP</td>
+                    <td>¥${route.price.toLocaleString()}</td>
+                    <td><strong>${route.efficiency.toFixed(1)}</strong></td>
+                    <td><span class="efficiency-score ${efficiencyClass}">${efficiencyText}</span></td>
+                    <td>${route.type}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('efficiency-results').style.display = 'block';
+        }
+
+        // Status planner
+        function generatePlan() {
+            const targetStatus = document.getElementById('target-status').value;
+            const currentPP = parseInt(document.getElementById('planning-current-pp').value) || 0;
+            const targetDate = document.getElementById('target-date').value;
+            const monthlyBudget = parseInt(document.getElementById('monthly-budget').value) || 0;
+            const preferredAirport = document.getElementById('preferred-airport').value;
+
+            const thresholds = { bronze: 30000, platinum: 50000, diamond: 100000 };
+            const requiredPP = thresholds[targetStatus] - currentPP;
+
+            if (requiredPP <= 0) {
+                document.getElementById('strategy-recommendations').innerHTML = `
+                    <div class="suggestion-item" style="background: var(--ana-light-blue);">
+                        🎉 既に${targetStatus}の条件を満たしています！
+                    </div>
+                `;
+                return;
+            }
+
+            // Calculate recommendations
+            const months = targetDate ? Math.ceil((new Date(targetDate) - new Date()) / (1000 * 60 * 60 * 24 * 30)) : 12;
+            const monthlyPPTarget = Math.ceil(requiredPP / months);
+            
+            // Efficient route suggestions
+            const recommendations = [];
+            
+            if (monthlyBudget > 0) {
+                const hndIcnPP = 2500; // Approximate PP for HND-ICN round trip
+                const hndIcnCost = 70000;
+                const monthlyFlights = Math.floor(monthlyBudget / hndIcnCost);
+                const monthlyPPFromFlights = monthlyFlights * hndIcnPP;
+
+                recommendations.push({
+                    title: '🏃 PP修行戦略',
+                    content: `
+                        <strong>月間${monthlyFlights}回 HND-ICN往復</strong><br>
+                        月間獲得PP: ${monthlyPPFromFlights.toLocaleString()} PP<br>
+                        月間費用: ¥${(monthlyFlights * hndIcnCost).toLocaleString()}<br>
+                        達成期間: ${Math.ceil(requiredPP / monthlyPPFromFlights)}ヶ月
+                    `
+                });
+            }
+
+            recommendations.push({
+                title: '💡 最効率ルート',
+                content: `
+                    <strong>推奨ルート組み合わせ:</strong><br>
+                    1. HND-ICN往復 (2,500 PP / ¥70,000)<br>
+                    2. NRT-SIN往復 (6,800 PP / ¥150,000)<br>
+                    3. KIX-BKK往復 (5,900 PP / ¥140,000)
+                `
+            });
+
+            const recommendationsHtml = recommendations.map(rec => `
+                <div class="suggestion-item">
+                    <strong>${rec.title}</strong><br>
+                    ${rec.content}
+                </div>
+            `).join('');
+
+            document.getElementById('strategy-recommendations').innerHTML = recommendationsHtml;
+
+            // Show timeline
+            showTimeline(requiredPP, months, targetStatus);
+        }
+
+        function showTimeline(requiredPP, months, targetStatus) {
+            const timeline = document.getElementById('timeline-content');
+            const monthlyTarget = Math.ceil(requiredPP / months);
+            
+            let timelineHtml = `
+                <div style="margin-bottom: 20px;">
+                    <strong>目標:</strong> ${months}ヶ月で${requiredPP.toLocaleString()} PP獲得<br>
+                    <strong>月間目標:</strong> ${monthlyTarget.toLocaleString()} PP
+                </div>
+            `;
+
+            for (let i = 1; i <= Math.min(months, 12); i++) {
+                const progressPercent = (i / months) * 100;
+                timelineHtml += `
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>${i}ヶ月目</span>
+                            <span>${(monthlyTarget * i).toLocaleString()} PP</span>
+                        </div>
+                        <div class="timeline-bar">
+                            <div class="timeline-progress" style="width: ${Math.min(progressPercent, 100)}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            timeline.innerHTML = timelineHtml;
+            document.getElementById('planning-results').style.display = 'block';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAirports();
+            
+            // Set default target date to next year
+            const nextYear = new Date();
+            nextYear.setFullYear(nextYear.getFullYear() + 1);
+            document.getElementById('target-date').value = nextYear.toISOString().split('T')[0];
+        });
+    </script>
+</body>
+</html>
