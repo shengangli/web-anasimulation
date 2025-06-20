@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>ANA戦略的PPプランニングツール | AMC</title>
     <style>
         * {
@@ -182,6 +182,21 @@
             box-shadow: 0 0 0 2px rgba(0, 91, 172, 0.1);
         }
 
+        /* Airport optgroup styling */
+        .form-select optgroup {
+            font-weight: bold;
+            color: var(--ana-primary);
+            background-color: var(--ana-light-gray);
+            font-size: 13px;
+        }
+
+        .form-select optgroup option {
+            font-weight: normal;
+            color: var(--ana-text);
+            background-color: white;
+            padding-left: 20px;
+        }
+
         /* Buttons */
         .btn {
             padding: 10px 24px;
@@ -320,6 +335,10 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
+        }
+
+        .results-grid.no-price {
+            grid-template-columns: 1fr;
         }
 
         .result-item {
@@ -527,23 +546,398 @@
             margin-right: 5px;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .form-row {
-                flex-direction: column;
+        /* Hide scrollbar on navigation for cleaner mobile look */
+        .navigation::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .navigation {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Button Container for Desktop */
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .button-container .btn {
+            margin-right: 10px;
+        }
+        
+        .button-container .btn:last-child {
+            margin-right: 0;
+        }
+        @media (max-width: 1024px) {
+            .main-container {
+                padding: 15px;
             }
             
             .results-dashboard {
                 grid-template-columns: 1fr;
+                gap: 15px;
             }
             
             .planning-grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            /* Header adjustments */
+            .header {
+                height: 60px;
+            }
+            
+            .header-content {
+                padding: 0 15px;
+            }
+            
+            .logo {
+                font-size: 16px;
+            }
+            
+            .logo svg {
+                width: 30px;
+                height: 30px;
+            }
+            
+            /* Navigation */
+            .navigation {
+                height: auto;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .nav-content {
+                padding: 0;
+                min-width: fit-content;
             }
             
             .nav-item {
-                padding: 0 10px;
+                padding: 12px 15px;
+                font-size: 13px;
+                white-space: nowrap;
+            }
+            
+            /* Main content */
+            .main-container {
+                padding: 10px;
+                min-height: calc(100vh - 150px);
+            }
+            
+            .page-title {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+            
+            /* Forms - Improved proportions */
+            .form-row {
+                flex-direction: column;
+                gap: 12px;
+                margin-bottom: 12px;
+            }
+            
+            .form-group {
+                margin-bottom: 0;
+            }
+            
+            .form-group.small {
+                flex: 1;
+            }
+            
+            .form-label {
                 font-size: 12px;
+                margin-bottom: 4px;
+                font-weight: 600;
+            }
+            
+            .form-input,
+            .form-select {
+                font-size: 16px; /* Prevent zoom on iOS */
+                padding: 8px 10px;
+                height: 38px;
+                line-height: 1.4;
+            }
+            
+            /* Sections */
+            .section {
+                margin-bottom: 15px;
+                border-radius: 6px;
+            }
+            
+            .section-header {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .section-content {
+                padding: 12px;
+            }
+            
+            /* Flight entries - Better proportions */
+            .flight-entry {
+                padding: 12px;
+                margin-bottom: 10px;
+                border-radius: 6px;
+            }
+            
+            .flight-entry-header {
+                margin-bottom: 12px;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .flight-number {
+                font-size: 14px;
+                flex: 1;
+            }
+            
+            .distance-display {
+                font-size: 11px;
+                margin-top: 8px;
+                padding: 4px 8px;
+            }
+            
+            /* Buttons - Better sizing */
+            .btn {
+                padding: 8px 16px;
+                font-size: 13px;
+                width: 100%;
+                margin-bottom: 8px;
+                height: 38px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .btn-add {
+                width: auto;
+                margin: 8px auto 0;
+                display: block;
+                padding: 6px 16px;
+                height: auto;
+            }
+            
+            .btn-remove {
+                padding: 4px 10px;
+                font-size: 11px;
+                width: auto;
+                height: auto;
+                margin-bottom: 0;
+            }
+            
+            /* Template buttons */
+            .template-buttons {
+                flex-wrap: wrap;
+                gap: 6px;
+                margin-bottom: 12px;
+            }
+            
+            .template-btn {
+                padding: 6px 10px;
+                font-size: 11px;
+                flex: 1 1 calc(50% - 3px);
+                min-width: 0;
+                height: 32px;
+            }
+            
+            /* Results */
+            .results-dashboard {
+                gap: 10px;
+            }
+            
+            .results-main,
+            .results-summary {
+                padding: 15px;
+            }
+            
+            .results-title {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+            
+            .results-grid {
+                gap: 8px;
+            }
+            
+            .results-grid.no-price {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-item {
+                padding: 10px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+                min-height: 60px;
+            }
+            
+            .result-label {
+                font-size: 11px;
+                color: var(--ana-gray);
+            }
+            
+            .result-value {
+                font-size: 14px;
+                margin-top: 2px;
+            }
+            
+            .result-highlight {
+                padding: 12px;
+            }
+            
+            /* Efficiency meter */
+            .efficiency-meter {
+                margin: 10px 0;
+            }
+            
+            .efficiency-meter span {
+                font-size: 10px !important;
+            }
+            
+            .efficiency-bar {
+                height: 6px;
+                margin: 0 8px;
+            }
+            
+            /* Efficiency table - make scrollable */
+            .efficiency-table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0 -12px;
+                padding: 0 12px;
+            }
+            
+            .efficiency-table {
+                font-size: 12px;
+                min-width: 600px;
+            }
+            
+            .efficiency-table th,
+            .efficiency-table td {
+                padding: 8px 6px;
+                font-size: 11px;
+            }
+            
+            /* Status progress */
+            .status-progress {
+                margin-bottom: 15px;
+            }
+            
+            .progress-ring {
+                width: 80px;
+                height: 80px;
+            }
+            
+            /* Suggestions */
+            .suggestion-item {
+                padding: 10px;
+                font-size: 12px;
+                line-height: 1.5;
+                margin: 8px 0;
+            }
+            
+            /* Timeline */
+            .timeline-bar {
+                height: 14px;
+                margin: 8px 0;
+            }
+            
+            /* Notice */
+            .notice {
+                padding: 10px;
+                font-size: 11px;
+                margin-bottom: 12px;
+                line-height: 1.5;
+            }
+            
+            /* Small text helper */
+            small {
+                font-size: 10px;
+                line-height: 1.4;
+                display: block;
+                margin-top: 2px;
+            }
+            
+            /* Advanced options */
+            #advanced-options {
+                margin-top: 10px !important;
+                padding: 10px !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* Extra small devices */
+            .header {
+                height: 50px;
+            }
+            
+            .logo span {
+                font-size: 14px;
+            }
+            
+            .logo svg {
+                width: 25px;
+                height: 25px;
+            }
+            
+            .nav-item {
+                padding: 10px 12px;
+                font-size: 12px;
+            }
+            
+            .page-title {
+                font-size: 18px;
+            }
+            
+            .template-btn {
+                flex: 1 1 100%;
+            }
+            
+            .btn {
+                font-size: 12px;
+                padding: 8px 16px;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-item {
+                border-left: 3px solid var(--ana-secondary);
+            }
+            
+            /* Center align calculation buttons on mobile */
+            .button-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .button-container .btn {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 !important;
+            }
+        }
+        
+        /* Touch-friendly adjustments */
+        @media (hover: none) and (pointer: coarse) {
+            .btn {
+                min-height: 44px;
+            }
+            
+            .form-input,
+            .form-select {
+                min-height: 44px;
+            }
+            
+            .nav-item {
+                min-height: 44px;
             }
         }
     </style>
@@ -578,8 +972,12 @@
             <h1 class="page-title">旅行計算機 - PP・マイル・効率を同時分析</h1>
             
             <div class="notice">
-                <span class="notice-icon">💡</span>
-                チケット価格を入力してPP効率を計算。最適な予約クラスとルートを見つけましょう。
+                <span class="notice-icon">⚠️</span>
+                <strong>重要な注意事項:</strong> この計算機は概算シミュレーション用です。実際のANA公式データとは異なる場合があります。
+                <br>• 距離データ: 大圏距離の近似値を使用（ANA公式距離ではありません）
+                <br>• 予約クラス: 一般的なANA予約クラスを模擬（最新の運賃体系と異なる場合があります）
+                <br>• PP計算: 簡略化された計算式を使用
+                <br><strong>正確なPP・マイル獲得数は、ANA公式サイトでご確認ください。</strong>
             </div>
 
             <!-- Quick Templates -->
@@ -616,32 +1014,26 @@
                                 <div class="form-group">
                                     <label class="form-label">予約クラス</label>
                                     <select class="form-select booking-class">
-                                        <option value="Y">エコノミー (Y) - 100%</option>
-                                        <option value="B">エコノミー (B) - 70%</option>
-                                        <option value="M">エコノミー (M) - 50%</option>
-                                        <option value="W">プレミアムエコノミー (W) - 130%</option>
-                                        <option value="J">ビジネス (J) - 150%</option>
-                                        <option value="F">ファースト (F) - 200%</option>
+                                        <option value="">まず空港を選択してください</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label class="form-label">チケット価格 (税込)</label>
-                                    <input type="number" class="form-input ticket-price" placeholder="例: 85000" min="0">
-                                    <small style="color: var(--ana-gray);">円</small>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">運航会社</label>
-                                    <select class="form-select airline">
-                                        <option value="ana">ANA</option>
-                                        <option value="star-alliance">スターアライアンス</option>
-                                        <option value="partner">提携航空会社</option>
-                                    </select>
+                                    <label class="form-label">1区間チケット価格 (税込) - オプション</label>
+                                    <input type="number" class="form-input ticket-price" placeholder="価格を入力するとPP効率も計算されます" min="0">
+                                    <small style="color: var(--ana-gray);">円 (片道価格) - 空白でもPP・マイル計算可能</small>
                                 </div>
                                 <div class="form-group small">
-                                    <label class="form-label">区間数</label>
-                                    <input type="number" class="form-input segments" value="1" min="1">
+                                    <label class="form-label">往復・複数区間</label>
+                                    <select class="form-select trip-multiplier">
+                                        <option value="1">片道 (1区間)</option>
+                                        <option value="2">往復 (2区間)</option>
+                                        <option value="3">3区間</option>
+                                        <option value="4">4区間</option>
+                                        <option value="5">5区間</option>
+                                        <option value="6">6区間以上</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="distance-display"></div>
@@ -653,7 +1045,7 @@
             </div>
 
             <div class="section">
-                <div class="section-header">ステータス・設定</div>
+                <div class="section-header">基本設定</div>
                 <div class="section-content">
                     <div class="form-row">
                         <div class="form-group">
@@ -665,17 +1057,32 @@
                                 <option value="diamond">ダイヤモンドサービス (+100%)</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">現在のPP残高</label>
-                            <input type="number" class="form-input" id="current-pp" placeholder="0" value="0">
+                    </div>
+                    
+                    <!-- Advanced Options (Collapsible) -->
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="btn" style="background: var(--ana-light-gray); color: var(--ana-text); font-size: 13px; padding: 8px 16px;" onclick="toggleAdvancedOptions()">
+                            <span id="advanced-toggle">▶</span> 詳細オプション
+                        </button>
+                        <div id="advanced-options" style="display: none; margin-top: 15px; padding: 15px; background: var(--ana-light-gray); border-radius: 6px;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">現在のPP残高 (オプション)</label>
+                                    <input type="number" class="form-input" id="current-pp" placeholder="0" value="0">
+                                    <small style="color: var(--ana-gray);">ステータス進捗計算に使用</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div style="text-align: center; margin: 30px 0;">
-                <button class="btn btn-primary" onclick="calculateTrip()">
+            <div class="button-container" style="text-align: center; margin: 30px 0;">
+                <button class="btn btn-primary" onclick="calculateTrip()" style="margin-right: 10px;">
                     📊 詳細分析を実行
+                </button>
+                <button class="btn" onclick="testCalculation()" style="background: var(--ana-light-gray); color: var(--ana-text);">
+                    🔧 テスト
                 </button>
             </div>
 
@@ -775,23 +1182,25 @@
                 <div class="section">
                     <div class="section-header">🏆 ルート効率ランキング</div>
                     <div class="section-content">
-                        <table class="efficiency-table">
-                            <thead>
-                                <tr>
-                                    <th>順位</th>
-                                    <th>ルート</th>
-                                    <th>推奨クラス</th>
-                                    <th>PP獲得</th>
-                                    <th>概算価格</th>
-                                    <th>PP効率</th>
-                                    <th>評価</th>
-                                    <th>タイプ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="efficiency-table-body">
-                                <!-- Dynamic content will be inserted here -->
-                            </tbody>
-                        </table>
+                        <div class="efficiency-table-wrapper">
+                            <table class="efficiency-table">
+                                <thead>
+                                    <tr>
+                                        <th>順位</th>
+                                        <th>ルート</th>
+                                        <th>推奨クラス</th>
+                                        <th>PP獲得</th>
+                                        <th>概算価格</th>
+                                        <th>PP効率</th>
+                                        <th>評価</th>
+                                        <th>タイプ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="efficiency-table-body">
+                                    <!-- Dynamic content will be inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -863,8 +1272,9 @@
     </div>
 
     <script>
-        // Enhanced route distances and PP rates
+        // Enhanced route distances and PP rates - More comprehensive coverage
         const routeDistances = {
+            // Major International Routes from Japan
             'NRT-LAX': 5451, 'NRT-JFK': 6737, 'NRT-LHR': 5956, 'NRT-SIN': 3312, 'NRT-SYD': 4863, 'NRT-FRA': 5928,
             'NRT-CDG': 6012, 'NRT-AMS': 5863, 'NRT-MAD': 6734, 'NRT-FCO': 6125, 'NRT-ZUR': 5890, 'NRT-VIE': 5623,
             'HND-ORD': 6262, 'HND-LAX': 5440, 'HND-SFO': 5130, 'HND-SEA': 4782, 'HND-DFW': 6456, 'HND-IAH': 6804,
@@ -878,33 +1288,168 @@
             'NGO-ICN': 598, 'NGO-TPE': 1153, 'NGO-PVG': 934, 'NGO-HKG': 1647, 'NGO-GUM': 1405, 'NGO-SIN': 3152,
             'CTS-ICN': 600, 'CTS-TPE': 1353, 'CTS-HKG': 1847, 'CTS-SIN': 3352, 'CTS-BKK': 3069, 'CTS-GUM': 1605,
             'OKA-ICN': 618, 'OKA-TPE': 613, 'OKA-HKG': 881, 'OKA-SIN': 2450, 'OKA-BKK': 2167, 'OKA-MNL': 758,
-            // Domestic routes
-            'NRT-HND': 20, 'NRT-KIX': 280, 'NRT-NGO': 180, 'NRT-CTS': 510, 'NRT-FUK': 565, 'NRT-OKA': 984,
-            'HND-KIX': 280, 'HND-NGO': 180, 'HND-CTS': 510, 'HND-FUK': 565, 'HND-OKA': 984,
-            'KIX-NGO': 120, 'KIX-CTS': 730, 'KIX-FUK': 285, 'KIX-OKA': 704
+            
+            // Additional International Routes
+            'NRT-HNL': 3853, 'HND-HNL': 3850, 'NRT-GUM': 1560, 'HND-GUM': 1555,
+            'ITM-ICN': 520, 'ITM-TPE': 960, 'ITM-HKG': 1450, 'ITM-PVG': 740, 'ITM-SIN': 3220,
+            'FUK-PVG': 550, 'FUK-TPE': 750, 'FUK-HKG': 1100, 'FUK-BKK': 2580, 'FUK-MNL': 1580,
+            'CTS-LAX': 5280, 'CTS-SFO': 5010, 'OKA-LAX': 6030, 'OKA-SFO': 5720,
+            
+            // Domestic routes - All combinations
+            'NRT-HND': 20, 'NRT-KIX': 280, 'NRT-ITM': 280, 'NRT-NGO': 180, 'NRT-CTS': 510, 'NRT-FUK': 565, 'NRT-OKA': 984,
+            'HND-KIX': 280, 'HND-ITM': 280, 'HND-NGO': 180, 'HND-CTS': 510, 'HND-FUK': 565, 'HND-OKA': 984,
+            'KIX-NGO': 120, 'KIX-CTS': 730, 'KIX-FUK': 285, 'KIX-OKA': 704, 'KIX-ITM': 20,
+            'ITM-NGO': 110, 'ITM-CTS': 720, 'ITM-FUK': 280, 'ITM-OKA': 700,
+            'NGO-CTS': 610, 'NGO-FUK': 405, 'NGO-OKA': 804,
+            'CTS-FUK': 1175, 'CTS-OKA': 1494,
+            'FUK-OKA': 419,
+            
+            // European connections
+            'NRT-MUC': 5890, 'NRT-BCN': 6590, 'NRT-MXP': 6090, 'NRT-ARN': 5280, 'NRT-CPH': 5420,
+            'HND-LHR': 5960, 'HND-CDG': 6015, 'HND-FRA': 5930, 'HND-AMS': 5865, 'HND-VIE': 5625,
+            'KIX-LHR': 5990, 'KIX-CDG': 6045, 'KIX-FRA': 5960, 'KIX-AMS': 5895,
+            
+            // Americas connections  
+            'NRT-YVR': 4691, 'NRT-YYZ': 6423, 'NRT-MEX': 7030, 'NRT-GRU': 11535, 'NRT-EZE': 11350,
+            'HND-YVR': 4685, 'HND-YYZ': 6420, 'HND-MEX': 7025, 'HND-GRU': 11530,
+            'KIX-YVR': 4895, 'KIX-YYZ': 6630, 'KIX-ORD': 6470,
+            
+            // Middle East & Africa
+            'NRT-TLV': 5760, 'NRT-ADD': 7890, 'NRT-NBO': 7450, 'NRT-CPT': 9155,
+            'HND-DXB': 5065, 'HND-DOH': 4955, 'HND-IST': 5625,
+            'KIX-DXB': 5095, 'KIX-DOH': 4985, 'KIX-IST': 5655,
+            
+            // Additional Asia-Pacific
+            'NRT-SGN': 2150, 'NRT-RGN': 2985, 'NRT-BNE': 4482, 'NRT-AKL': 5472, 'NRT-MEL': 5099,
+            'HND-SGN': 2145, 'HND-RGN': 2980, 'HND-BNE': 4478, 'HND-AKL': 5468, 'HND-MEL': 5095,
+            'KIX-SGN': 2080, 'KIX-RGN': 2915, 'KIX-BNE': 4512, 'KIX-AKL': 5502, 'KIX-MEL': 5129,
+            'NGO-BKK': 2820, 'NGO-MNL': 1710, 'CTS-PVG': 1200, 'CTS-PEK': 1100,
+            'FUK-PEK': 900, 'FUK-DEL': 3485, 'OKA-PVG': 820, 'OKA-PEK': 1200
         };
 
-        // Airport names in Japanese
-        const airportNames = {
-            'NRT': '東京成田 (NRT)', 'HND': '東京羽田 (HND)', 'KIX': '大阪関西 (KIX)', 'ITM': '大阪伊丹 (ITM)',
-            'NGO': '名古屋中部 (NGO)', 'CTS': '札幌新千歳 (CTS)', 'FUK': '福岡 (FUK)', 'OKA': '沖縄那覇 (OKA)',
-            'LAX': 'ロサンゼルス (LAX)', 'SFO': 'サンフランシスコ (SFO)', 'SEA': 'シアトル (SEA)', 
-            'JFK': 'ニューヨーク JFK (JFK)', 'ORD': 'シカゴ オヘア (ORD)', 'DFW': 'ダラス (DFW)', 'IAH': 'ヒューストン (IAH)',
-            'LHR': 'ロンドン ヒースロー (LHR)', 'CDG': 'パリ CDG (CDG)', 'FRA': 'フランクフルト (FRA)', 
-            'AMS': 'アムステルダム (AMS)', 'MAD': 'マドリード (MAD)', 'FCO': 'ローマ (FCO)', 'ZUR': 'チューリッヒ (ZUR)',
-            'SIN': 'シンガポール (SIN)', 'BKK': 'バンコク (BKK)', 'HKG': '香港 (HKG)', 'ICN': 'ソウル仁川 (ICN)',
-            'PEK': '北京首都 (PEK)', 'PVG': '上海浦東 (PVG)', 'TPE': '台北桃園 (TPE)', 'MNL': 'マニラ (MNL)',
-            'GUM': 'グアム (GUM)', 'HNL': 'ホノルル (HNL)'
+        // Airport data organized by regions
+        const airportsByRegion = {
+            '日本国内': {
+                'NRT': '東京成田 (NRT)',
+                'HND': '東京羽田 (HND)', 
+                'KIX': '大阪関西 (KIX)',
+                'ITM': '大阪伊丹 (ITM)',
+                'NGO': '名古屋中部 (NGO)',
+                'CTS': '札幌新千歳 (CTS)',
+                'FUK': '福岡 (FUK)',
+                'OKA': '沖縄那覇 (OKA)'
+            },
+            'アジア・太平洋': {
+                'ICN': 'ソウル仁川 (ICN)',
+                'PEK': '北京首都 (PEK)',
+                'PVG': '上海浦東 (PVG)',
+                'TPE': '台北桃園 (TPE)',
+                'HKG': '香港 (HKG)',
+                'SIN': 'シンガポール (SIN)',
+                'BKK': 'バンコク (BKK)',
+                'MNL': 'マニラ (MNL)',
+                'SYD': 'シドニー (SYD)',
+                'GUM': 'グアム (GUM)'
+            },
+            '北米': {
+                'LAX': 'ロサンゼルス (LAX)',
+                'SFO': 'サンフランシスコ (SFO)',
+                'SEA': 'シアトル (SEA)',
+                'JFK': 'ニューヨーク JFK (JFK)',
+                'ORD': 'シカゴ オヘア (ORD)',
+                'DFW': 'ダラス (DFW)',
+                'IAH': 'ヒューストン (IAH)',
+                'HNL': 'ホノルル (HNL)'
+            },
+            'ヨーロッパ': {
+                'LHR': 'ロンドン ヒースロー (LHR)',
+                'CDG': 'パリ CDG (CDG)',
+                'FRA': 'フランクフルト (FRA)',
+                'AMS': 'アムステルダム (AMS)',
+                'MAD': 'マドリード (MAD)',
+                'FCO': 'ローマ (FCO)',
+                'ZUR': 'チューリッヒ (ZUR)',
+                'VIE': 'ウィーン (VIE)',
+                'IST': 'イスタンブール (IST)'
+            },
+            '中東・その他': {
+                'DXB': 'ドバイ (DXB)',
+                'DOH': 'ドーハ (DOH)',
+                'BOM': 'ムンバイ (BOM)',
+                'DEL': 'デリー (DEL)'
+            }
         };
 
-        // Class earning rates and typical prices
+        // Create flat airport names lookup for compatibility
+        const airportNames = {};
+        Object.keys(airportsByRegion).forEach(region => {
+            Object.assign(airportNames, airportsByRegion[region]);
+        });
+
+        // ANA Booking Class Data - Separated by Domestic vs International
+        const domesticClassData = {
+            // ANA Domestic Economy Classes
+            'Y': { rate: 1.0, name: 'Y (普通席・普通運賃)', category: 'economy', ppMultiplier: 1.0 },
+            'B': { rate: 0.75, name: 'B (普通席・特便割引)', category: 'economy', ppMultiplier: 0.75 },
+            'M': { rate: 0.75, name: 'M (普通席・特便割引)', category: 'economy', ppMultiplier: 0.75 },
+            'U': { rate: 0.75, name: 'U (普通席・特便割引)', category: 'economy', ppMultiplier: 0.75 },
+            'H': { rate: 0.75, name: 'H (普通席・特便割引)', category: 'economy', ppMultiplier: 0.75 },
+            'Q': { rate: 0.75, name: 'Q (普通席・特便割引)', category: 'economy', ppMultiplier: 0.75 },
+            'V': { rate: 0.5, name: 'V (普通席・特割)', category: 'economy', ppMultiplier: 0.5 },
+            'W': { rate: 0.5, name: 'W (普通席・特割)', category: 'economy', ppMultiplier: 0.5 },
+            'S': { rate: 0.5, name: 'S (普通席・特割)', category: 'economy', ppMultiplier: 0.5 },
+            'T': { rate: 0.5, name: 'T (普通席・特割)', category: 'economy', ppMultiplier: 0.5 },
+            'L': { rate: 0.5, name: 'L (普通席・特割)', category: 'economy', ppMultiplier: 0.5 },
+            'G': { rate: 0.5, name: 'G (普通席・特割)', category: 'economy', ppMultiplier: 0.5 },
+            'K': { rate: 0.5, name: 'K (普通席・特割)', category: 'economy', ppMultiplier: 0.5 },
+            'E': { rate: 0.5, name: 'E (普通席・特割)', category: 'economy', ppMultiplier: 0.5 },
+            
+            // ANA Domestic Premium Classes
+            'J': { rate: 2.0, name: 'J (プレミアムクラス)', category: 'premium', ppMultiplier: 2.0 },
+            'C': { rate: 2.0, name: 'C (プレミアムクラス)', category: 'premium', ppMultiplier: 2.0 },
+            'D': { rate: 2.0, name: 'D (プレミアムクラス)', category: 'premium', ppMultiplier: 2.0 },
+            'I': { rate: 2.0, name: 'I (プレミアムクラス)', category: 'premium', ppMultiplier: 2.0 }
+        };
+
+        const internationalClassData = {
+            // International Economy Classes
+            'Y': { rate: 1.0, name: 'Y (エコノミー・普通運賃)', category: 'economy', ppMultiplier: 1.0 },
+            'B': { rate: 0.7, name: 'B (エコノミー・割引運賃)', category: 'economy', ppMultiplier: 0.7 },
+            'M': { rate: 0.7, name: 'M (エコノミー・割引運賃)', category: 'economy', ppMultiplier: 0.7 },
+            'U': { rate: 0.5, name: 'U (エコノミー・格安運賃)', category: 'economy', ppMultiplier: 0.5 },
+            'H': { rate: 0.5, name: 'H (エコノミー・格安運賃)', category: 'economy', ppMultiplier: 0.5 },
+            'Q': { rate: 0.5, name: 'Q (エコノミー・格安運賃)', category: 'economy', ppMultiplier: 0.5 },
+            'V': { rate: 0.3, name: 'V (エコノミー・超格安)', category: 'economy', ppMultiplier: 0.3 },
+            'W': { rate: 0.3, name: 'W (エコノミー・超格安)', category: 'economy', ppMultiplier: 0.3 },
+            'S': { rate: 0.3, name: 'S (エコノミー・超格安)', category: 'economy', ppMultiplier: 0.3 },
+            'T': { rate: 0.3, name: 'T (エコノミー・超格安)', category: 'economy', ppMultiplier: 0.3 },
+            'L': { rate: 0.3, name: 'L (エコノミー・超格安)', category: 'economy', ppMultiplier: 0.3 },
+            'G': { rate: 0.3, name: 'G (エコノミー・超格安)', category: 'economy', ppMultiplier: 0.3 },
+            'K': { rate: 0.3, name: 'K (エコノミー・超格安)', category: 'economy', ppMultiplier: 0.3 },
+            'E': { rate: 0.3, name: 'E (エコノミー・超格安)', category: 'economy', ppMultiplier: 0.3 },
+            
+            // Premium Economy Classes (International only)
+            'P': { rate: 1.3, name: 'P (プレミアムエコノミー)', category: 'premium-economy', ppMultiplier: 1.3 },
+            'O': { rate: 1.3, name: 'O (プレミアムエコノミー)', category: 'premium-economy', ppMultiplier: 1.3 },
+            'N': { rate: 1.3, name: 'N (プレミアムエコノミー)', category: 'premium-economy', ppMultiplier: 1.3 },
+            
+            // Business Classes
+            'J': { rate: 1.5, name: 'J (ビジネスクラス)', category: 'business', ppMultiplier: 1.5 },
+            'C': { rate: 1.5, name: 'C (ビジネスクラス)', category: 'business', ppMultiplier: 1.5 },
+            'D': { rate: 1.25, name: 'D (ビジネス・割引)', category: 'business', ppMultiplier: 1.25 },
+            'I': { rate: 1.25, name: 'I (ビジネス・割引)', category: 'business', ppMultiplier: 1.25 },
+            'Z': { rate: 1.25, name: 'Z (ビジネス・割引)', category: 'business', ppMultiplier: 1.25 },
+            
+            // First Class (International only)
+            'F': { rate: 2.0, name: 'F (ファーストクラス)', category: 'first', ppMultiplier: 2.0 },
+            'A': { rate: 2.0, name: 'A (ファーストクラス)', category: 'first', ppMultiplier: 2.0 }
+        };
+
+        // Price multipliers for efficiency analysis
         const classData = {
-            'Y': { rate: 1.0, name: 'エコノミー (Y)', priceMultiplier: 1.0 },
-            'B': { rate: 0.7, name: 'エコノミー (B)', priceMultiplier: 0.85 },
-            'M': { rate: 0.5, name: 'エコノミー (M)', priceMultiplier: 0.7 },
-            'W': { rate: 1.3, name: 'プレミアムエコノミー (W)', priceMultiplier: 1.8 },
-            'J': { rate: 1.5, name: 'ビジネス (J)', priceMultiplier: 4.0 },
-            'F': { rate: 2.0, name: 'ファースト (F)', priceMultiplier: 8.0 }
+            'Y': { priceMultiplier: 1.5 },
+            'W': { priceMultiplier: 1.0 },
+            'J': { priceMultiplier: 3.0 }
         };
 
         // Status bonus rates
@@ -920,19 +1465,50 @@
 
         let flightCounter = 1;
 
-        // Initialize airports
+        // Test function to verify button works
+        function testCalculation() {
+            console.log('Test calculation function called');
+            alert('計算ボタンが正常に動作しています！まずは出発・到着空港と価格を入力してから「詳細分析を実行」をクリックしてください。');
+        }
+
+        // Toggle advanced options
+        function toggleAdvancedOptions() {
+            const options = document.getElementById('advanced-options');
+            const toggle = document.getElementById('advanced-toggle');
+            
+            if (options.style.display === 'none') {
+                options.style.display = 'block';
+                toggle.textContent = '▼';
+            } else {
+                options.style.display = 'none';
+                toggle.textContent = '▶';
+            }
+        }
+
+        // Initialize airports with regional grouping
         function initializeAirports() {
-            const airports = Object.keys(airportNames).sort();
             const selects = document.querySelectorAll('.from-airport, .to-airport');
             
             selects.forEach(select => {
                 const isFrom = select.classList.contains('from-airport');
                 select.innerHTML = isFrom ? '<option value="">出発空港を選択...</option>' : '<option value="">到着空港を選択...</option>';
-                airports.forEach(code => {
-                    const option = document.createElement('option');
-                    option.value = code;
-                    option.textContent = airportNames[code];
-                    select.appendChild(option);
+                
+                // Add airports by region
+                Object.keys(airportsByRegion).forEach(regionName => {
+                    const airports = airportsByRegion[regionName];
+                    
+                    // Add region header
+                    const regionOption = document.createElement('optgroup');
+                    regionOption.label = regionName;
+                    select.appendChild(regionOption);
+                    
+                    // Add airports in this region
+                    Object.keys(airports).forEach(code => {
+                        const option = document.createElement('option');
+                        option.value = code;
+                        option.textContent = airports[code];
+                        regionOption.appendChild(option);
+                    });
                 });
             });
         }
@@ -1008,49 +1584,56 @@
                     <div class="form-group">
                         <label class="form-label">予約クラス</label>
                         <select class="form-select booking-class">
-                            <option value="Y">エコノミー (Y) - 100%</option>
-                            <option value="B">エコノミー (B) - 70%</option>
-                            <option value="M">エコノミー (M) - 50%</option>
-                            <option value="W">プレミアムエコノミー (W) - 130%</option>
-                            <option value="J">ビジネス (J) - 150%</option>
-                            <option value="F">ファースト (F) - 200%</option>
+                            <option value="">まず空港を選択してください</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">チケット価格 (税込)</label>
-                        <input type="number" class="form-input ticket-price" placeholder="例: 85000" min="0">
-                        <small style="color: var(--ana-gray);">円</small>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">運航会社</label>
-                        <select class="form-select airline">
-                            <option value="ana">ANA</option>
-                            <option value="star-alliance">スターアライアンス</option>
-                            <option value="partner">提携航空会社</option>
-                        </select>
+                        <label class="form-label">1区間チケット価格 (税込) - オプション</label>
+                        <input type="number" class="form-input ticket-price" placeholder="価格を入力するとPP効率も計算されます" min="0">
+                        <small style="color: var(--ana-gray);">円 (片道価格) - 空白でもPP・マイル計算可能</small>
                     </div>
                     <div class="form-group small">
-                        <label class="form-label">区間数</label>
-                        <input type="number" class="form-input segments" value="1" min="1">
+                        <label class="form-label">往復・複数区間</label>
+                        <select class="form-select trip-multiplier">
+                            <option value="1">片道 (1区間)</option>
+                            <option value="2">往復 (2区間)</option>
+                            <option value="3">3区間</option>
+                            <option value="4">4区間</option>
+                            <option value="5">5区間</option>
+                            <option value="6">6区間以上</option>
+                        </select>
                     </div>
                 </div>
                 <div class="distance-display"></div>
             `;
             container.appendChild(newFlight);
             
-            // Initialize dropdowns
-            const airports = Object.keys(airportNames).sort();
+            // Initialize airport dropdowns with regional grouping
             const fromSelect = newFlight.querySelector('.from-airport');
             const toSelect = newFlight.querySelector('.to-airport');
             
             [fromSelect, toSelect].forEach(select => {
-                airports.forEach(code => {
-                    const option = document.createElement('option');
-                    option.value = code;
-                    option.textContent = airportNames[code];
-                    select.appendChild(option);
+                // Clear existing options (keep default)
+                const defaultOption = select.querySelector('option[value=""]');
+                
+                // Add airports by region
+                Object.keys(airportsByRegion).forEach(regionName => {
+                    const airports = airportsByRegion[regionName];
+                    
+                    // Add region header
+                    const regionOption = document.createElement('optgroup');
+                    regionOption.label = regionName;
+                    select.appendChild(regionOption);
+                    
+                    // Add airports in this region
+                    Object.keys(airports).forEach(code => {
+                        const option = document.createElement('option');
+                        option.value = code;
+                        option.textContent = airports[code];
+                        regionOption.appendChild(option);
+                    });
                 });
             });
         }
@@ -1065,6 +1648,7 @@
             const from = flight.querySelector('.from-airport').value;
             const to = flight.querySelector('.to-airport').value;
             const display = flight.querySelector('.distance-display');
+            const classSelect = flight.querySelector('.booking-class');
             
             if (from && to) {
                 const distance = getDistance(from, to);
@@ -1072,16 +1656,92 @@
                 const typeClass = routeType === 'domestic' ? 'route-domestic' : 'route-international';
                 const typeText = routeType === 'domestic' ? '国内線' : '国際線';
                 
+                // Update booking class options based on route type
+                updateBookingClassOptions(classSelect, routeType);
+                
                 if (distance > 0) {
                     display.innerHTML = `
                         距離: ${distance.toLocaleString()} マイル
                         <span class="route-type-indicator ${typeClass}">${typeText}</span>
                     `;
                 } else {
-                    display.innerHTML = '<span style="color: var(--ana-red);">このルートはデータベースにありません</span>';
+                    display.innerHTML = '<span style="color: var(--ana-red);">このルートはデータベースにありません（概算値を使用）</span>';
+                    // Provide an estimate if route not found
+                    const estimatedDistance = estimateDistance(from, to);
+                    if (estimatedDistance > 0) {
+                        display.innerHTML += `<br>推定距離: ${estimatedDistance.toLocaleString()} マイル`;
+                    }
                 }
             } else {
                 display.innerHTML = '';
+                classSelect.innerHTML = '<option value="">まず空港を選択してください</option>';
+            }
+        }
+
+        // Update booking class options based on route type
+        function updateBookingClassOptions(select, routeType) {
+            const currentValue = select.value;
+            select.innerHTML = '';
+            
+            // Add default option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = '予約クラスを選択...';
+            select.appendChild(defaultOption);
+            
+            // Choose the appropriate class data based on route type
+            const classData = routeType === 'domestic' ? domesticClassData : internationalClassData;
+            
+            // Group classes by category
+            const categories = {};
+            
+            if (routeType === 'domestic') {
+                categories.economy = { name: '--- 普通席 ---', classes: [] };
+                categories.premium = { name: '--- プレミアムクラス ---', classes: [] };
+            } else {
+                categories.economy = { name: '--- エコノミークラス ---', classes: [] };
+                categories['premium-economy'] = { name: '--- プレミアムエコノミー ---', classes: [] };
+                categories.business = { name: '--- ビジネスクラス ---', classes: [] };
+                categories.first = { name: '--- ファーストクラス ---', classes: [] };
+            }
+            
+            // Filter classes based on route type
+            Object.keys(classData).forEach(classCode => {
+                const classInfo = classData[classCode];
+                
+                if (categories[classInfo.category]) {
+                    categories[classInfo.category].classes.push({
+                        code: classCode,
+                        name: classInfo.name,
+                        rate: classInfo.rate
+                    });
+                }
+            });
+            
+            // Add options to select
+            Object.keys(categories).forEach(categoryKey => {
+                const category = categories[categoryKey];
+                if (category.classes.length > 0) {
+                    // Add class options grouped
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = category.name;
+                    select.appendChild(optgroup);
+                    
+                    // Sort classes by rate (highest first for better visibility)
+                    category.classes.sort((a, b) => b.rate - a.rate);
+                    
+                    category.classes.forEach(classInfo => {
+                        const option = document.createElement('option');
+                        option.value = classInfo.code;
+                        option.textContent = `${classInfo.name} (${Math.round(classInfo.rate * 100)}%)`;
+                        optgroup.appendChild(option);
+                    });
+                }
+            });
+            
+            // Restore previous value if still valid
+            if (currentValue && select.querySelector(`option[value="${currentValue}"]`)) {
+                select.value = currentValue;
             }
         }
 
@@ -1092,115 +1752,232 @@
             return routeDistances[route] || routeDistances[reverse] || 0;
         }
 
+        // Estimate distance for missing routes
+        function estimateDistance(from, to) {
+            // Use simple heuristics for estimation based on known routes
+            const domesticAirports = ['NRT', 'HND', 'KIX', 'ITM', 'NGO', 'CTS', 'FUK', 'OKA'];
+            const isDomestic = domesticAirports.includes(from) && domesticAirports.includes(to);
+            
+            if (isDomestic) {
+                // Estimate based on region
+                if ((from === 'CTS' || to === 'CTS') && (from === 'OKA' || to === 'OKA')) return 1494;
+                if (from === 'CTS' || to === 'CTS') return 700;
+                if (from === 'OKA' || to === 'OKA') return 800;
+                return 300; // Default domestic estimate
+            } else {
+                // Estimate international based on regions
+                const asiaAirports = ['ICN', 'PEK', 'PVG', 'TPE', 'HKG', 'SIN', 'BKK', 'MNL'];
+                const europeAirports = ['LHR', 'CDG', 'FRA', 'AMS', 'MAD', 'FCO', 'ZUR', 'VIE'];
+                const americasAirports = ['LAX', 'SFO', 'SEA', 'JFK', 'ORD', 'DFW', 'IAH', 'HNL'];
+                
+                if (asiaAirports.includes(from) || asiaAirports.includes(to)) return 2000;
+                if (europeAirports.includes(from) || europeAirports.includes(to)) return 5900;
+                if (americasAirports.includes(from) || americasAirports.includes(to)) return 5500;
+                return 3500; // Default international estimate
+            }
+        }
+
         function isInternational(from, to) {
             const domesticAirports = ['NRT', 'HND', 'KIX', 'ITM', 'NGO', 'CTS', 'FUK', 'OKA'];
             return !(domesticAirports.includes(from) && domesticAirports.includes(to));
         }
 
-        function calculatePP(distance, classCode, routeType, segments = 1) {
-            const baseRate = classData[classCode].rate;
-            const ppPerMile = routeType === 'domestic' ? 
-                Math.min(ppRates.domestic.base * baseRate, ppRates.domestic.max) :
-                Math.min(ppRates.international.base * baseRate, ppRates.international.max);
-            return Math.floor(distance * ppPerMile * segments);
+        function calculatePP(distance, classCode, routeType) {
+            const classData = routeType === 'domestic' ? domesticClassData : internationalClassData;
+            const classInfo = classData[classCode];
+            
+            if (!classInfo) return 0;
+            
+            if (routeType === 'domestic') {
+                // ANA domestic PP calculation (simplified zone-based system)
+                // Note: Actual ANA domestic uses complex zone system, this is approximation
+                let basePP;
+                if (distance <= 300) basePP = 280;        // Zone 1
+                else if (distance <= 600) basePP = 370;   // Zone 2  
+                else if (distance <= 900) basePP = 560;   // Zone 3
+                else basePP = 1120;                       // Zone 4+
+                
+                return Math.floor(basePP * classInfo.ppMultiplier);
+            } else {
+                // International PP calculation (distance-based)
+                const ppPerMile = Math.min(distance * 0.5, 12); // Max 12 PP per mile
+                return Math.floor(distance * ppPerMile * classInfo.ppMultiplier);
+            }
         }
 
-        function calculateMiles(distance, classCode, airline, segments = 1) {
-            const baseRate = classData[classCode].rate;
-            const airlineMultiplier = airline === 'ana' ? 1.0 : (airline === 'star-alliance' ? 0.8 : 0.6);
-            return Math.floor(distance * baseRate * airlineMultiplier * segments);
+        function calculateMiles(distance, classCode, routeType) {
+            const classData = routeType === 'domestic' ? domesticClassData : internationalClassData;
+            const classInfo = classData[classCode];
+            
+            if (!classInfo) return 0;
+            
+            return Math.floor(distance * classInfo.rate);
         }
 
-        // Main calculation function
+        // Main calculation function - Fixed version
         function calculateTrip() {
+            console.log('calculateTrip function called');
+            
             try {
                 const flights = document.querySelectorAll('.flight-entry');
                 const currentStatus = document.getElementById('current-status').value;
                 const currentPP = parseInt(document.getElementById('current-pp').value) || 0;
                 
+                console.log(`Found ${flights.length} flights`);
+                console.log(`Current status: ${currentStatus}`);
+                
                 let totalPP = 0;
                 let totalMiles = 0;
                 let totalCost = 0;
                 let validFlights = 0;
+                let hasInvalidClass = false;
 
-                flights.forEach(flight => {
+                flights.forEach((flight, index) => {
+                    console.log(`Processing flight ${index + 1}`);
+                    
                     const from = flight.querySelector('.from-airport').value;
                     const to = flight.querySelector('.to-airport').value;
                     const classCode = flight.querySelector('.booking-class').value;
-                    const price = parseInt(flight.querySelector('.ticket-price').value) || 0;
-                    const airline = flight.querySelector('.airline').value;
-                    const segments = parseInt(flight.querySelector('.segments').value) || 1;
+                    const ticketPrice = parseInt(flight.querySelector('.ticket-price').value) || 0;
+                    const multiplier = parseInt(flight.querySelector('.trip-multiplier').value) || 1;
 
-                    if (from && to && price > 0) {
-                        const distance = getDistance(from, to);
+                    console.log(`Flight ${index + 1}: ${from} -> ${to}, class: ${classCode}, price: ${ticketPrice || 'none'}, multiplier: ${multiplier}`);
+
+                    if (from && to && classCode) {
+                        let distance = getDistance(from, to);
+                        
+                        // If route not found, use estimate
+                        if (distance === 0) {
+                            distance = estimateDistance(from, to);
+                            console.log(`Using estimated distance: ${distance}`);
+                        }
+                        
+                        console.log(`Distance: ${distance}`);
+                        
                         if (distance > 0) {
-                            validFlights++;
                             const routeType = isInternational(from, to) ? 'international' : 'domestic';
+                            console.log(`Route type: ${routeType}`);
                             
-                            // Calculate base PP and miles
-                            const basePP = calculatePP(distance, classCode, routeType, segments);
-                            const baseMiles = calculateMiles(distance, classCode, airline, segments);
+                            const classData = routeType === 'domestic' ? domesticClassData : internationalClassData;
+                            
+                            // Check if class code is valid for this route type
+                            if (!classData[classCode]) {
+                                console.log(`Invalid class code ${classCode} for ${routeType} route`);
+                                hasInvalidClass = true;
+                                return;
+                            }
+                            
+                            validFlights++;
+                            
+                            // Calculate base PP and miles per segment
+                            const basePP = calculatePP(distance, classCode, routeType);
+                            const baseMiles = calculateMiles(distance, classCode, routeType);
+                            
+                            console.log(`Base PP: ${basePP}, Base Miles: ${baseMiles}`);
                             
                             // Apply status bonus
                             const statusMultiplier = 1 + statusBonus[currentStatus];
-                            const finalPP = Math.floor(basePP * statusMultiplier);
-                            const finalMiles = Math.floor(baseMiles * statusMultiplier);
+                            const finalPP = Math.floor(basePP * statusMultiplier * multiplier);
+                            const finalMiles = Math.floor(baseMiles * statusMultiplier * multiplier);
+                            
+                            console.log(`Final PP: ${finalPP}, Final Miles: ${finalMiles}`);
                             
                             totalPP += finalPP;
                             totalMiles += finalMiles;
-                            totalCost += price;
+                            if (ticketPrice > 0) {
+                                totalCost += (ticketPrice * multiplier);
+                            }
                         }
                     }
                 });
 
-                if (validFlights === 0) {
-                    alert('有効なフライトを入力してください（価格も含む）');
+                console.log(`Valid flights: ${validFlights}, Total PP: ${totalPP}, Total Cost: ${totalCost || 'No price data'}`);
+
+                if (hasInvalidClass) {
+                    alert('選択した予約クラスがこのルートタイプでは無効です。空港を再選択して予約クラスを更新してください。');
                     return;
                 }
 
-                // Calculate efficiency
-                const ppEfficiency = totalCost > 0 ? (totalPP / totalCost * 1000) : 0;
-                
+                if (validFlights === 0) {
+                    alert('有効なフライトを入力してください（出発・到着空港、予約クラスを選択）');
+                    return;
+                }
+
                 // Update display
                 document.getElementById('total-pp').textContent = totalPP.toLocaleString();
                 document.getElementById('total-miles').textContent = totalMiles.toLocaleString();
-                document.getElementById('total-cost').textContent = `¥${totalCost.toLocaleString()}`;
-                document.getElementById('pp-efficiency').textContent = `${ppEfficiency.toFixed(1)} PP/¥1000`;
+                
+                // Show different results based on whether price was entered
+                const resultsGrid = document.querySelector('.results-grid');
+                
+                if (totalCost > 0) {
+                    // Price was entered - show full analysis including efficiency
+                    resultsGrid.classList.remove('no-price');
+                    const ppEfficiency = (totalPP / totalCost * 1000);
+                    
+                    document.getElementById('total-cost').textContent = `¥${totalCost.toLocaleString()}`;
+                    document.getElementById('pp-efficiency').textContent = `${ppEfficiency.toFixed(1)} PP/¥1000`;
+                    
+                    // Show all result items
+                    document.querySelectorAll('.result-item').forEach(item => item.style.display = 'flex');
+                    document.querySelector('.result-highlight').style.display = 'block';
+                    
+                    // Efficiency rating
+                    let efficiencyClass, efficiencyText, efficiencyPercent;
+                    if (ppEfficiency >= 20) {
+                        efficiencyClass = 'efficiency-excellent';
+                        efficiencyText = '🏆 極めて優秀な効率';
+                        efficiencyPercent = 95;
+                    } else if (ppEfficiency >= 15) {
+                        efficiencyClass = 'efficiency-excellent';
+                        efficiencyText = '🏆 優秀な効率';
+                        efficiencyPercent = 85;
+                    } else if (ppEfficiency >= 10) {
+                        efficiencyClass = 'efficiency-good';
+                        efficiencyText = '👍 良好な効率';
+                        efficiencyPercent = 70;
+                    } else if (ppEfficiency >= 5) {
+                        efficiencyClass = 'efficiency-average';
+                        efficiencyText = '📊 平均的な効率';
+                        efficiencyPercent = 50;
+                    } else {
+                        efficiencyClass = 'efficiency-poor';
+                        efficiencyText = '⚠️ 効率改善推奨';
+                        efficiencyPercent = 25;
+                    }
 
-                // Efficiency rating
-                let efficiencyClass, efficiencyText, efficiencyPercent;
-                if (ppEfficiency >= 15) {
-                    efficiencyClass = 'efficiency-excellent';
-                    efficiencyText = '🏆 優秀な効率';
-                    efficiencyPercent = 90;
-                } else if (ppEfficiency >= 10) {
-                    efficiencyClass = 'efficiency-good';
-                    efficiencyText = '👍 良好な効率';
-                    efficiencyPercent = 70;
-                } else if (ppEfficiency >= 5) {
-                    efficiencyClass = 'efficiency-average';
-                    efficiencyText = '📊 平均的な効率';
-                    efficiencyPercent = 50;
+                    const efficiencyBar = document.getElementById('efficiency-bar');
+                    const efficiencyRating = document.getElementById('efficiency-rating');
+                    
+                    if (efficiencyBar && efficiencyRating) {
+                        efficiencyBar.className = `efficiency-fill ${efficiencyClass}`;
+                        efficiencyBar.style.width = `${efficiencyPercent}%`;
+                        efficiencyRating.textContent = efficiencyText;
+                    }
                 } else {
-                    efficiencyClass = 'efficiency-poor';
-                    efficiencyText = '⚠️ 効率改善必要';
-                    efficiencyPercent = 25;
+                    // No price entered - hide cost-related items
+                    resultsGrid.classList.add('no-price');
+                    document.querySelector('.result-item:nth-child(3)').style.display = 'none'; // Hide total cost
+                    document.querySelector('.result-item:nth-child(4)').style.display = 'none'; // Hide PP efficiency
+                    document.querySelector('.result-highlight').style.display = 'none'; // Hide efficiency evaluation
                 }
-
-                const efficiencyBar = document.getElementById('efficiency-bar');
-                const efficiencyRating = document.getElementById('efficiency-rating');
-                efficiencyBar.className = `efficiency-fill ${efficiencyClass}`;
-                efficiencyBar.style.width = `${efficiencyPercent}%`;
-                efficiencyRating.textContent = efficiencyText;
 
                 // Status progress
                 updateStatusProgress(currentPP + totalPP);
 
-                document.getElementById('trip-results').style.display = 'block';
+                // Show results
+                const resultsElement = document.getElementById('trip-results');
+                if (resultsElement) {
+                    resultsElement.style.display = 'block';
+                    resultsElement.scrollIntoView({ behavior: 'smooth' });
+                }
+                
+                console.log('Calculation completed successfully');
+                console.log(`Summary: ${totalPP} PP, ${totalMiles} miles${totalCost > 0 ? `, ¥${totalCost}` : ' (no price data)'}`);
                 
             } catch (error) {
                 console.error('Calculation error:', error);
-                alert('計算中にエラーが発生しました');
+                alert(`計算中にエラーが発生しました: ${error.message}`);
             }
         }
 
@@ -1290,7 +2067,7 @@
                     routes.push({
                         rank: 0,
                         route: `${airportNames[route.from].split('(')[0].trim()} → ${airportNames[route.to].split('(')[0].trim()}`,
-                        class: classData[classCode].name,
+                        class: internationalClassData[classCode].name,
                         pp: pp,
                         price: price,
                         efficiency: efficiency,
